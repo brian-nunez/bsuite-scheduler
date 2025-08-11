@@ -12,14 +12,10 @@ with DAG(
     default_args=default_args,
     description="Download highest-quality YouTube video via yt-dlp",
     params={
-        "url": "",  # required
-        # Pick best video+audio; if not available, fall back to best single stream
+        "url": "",
         "format": "bestvideo*+bestaudio/best",
-        # Prefer highest res, then fps, then modern codecs, then bitrate/filesize
         "format_sort": "res,fps,codec:av1:vp9:h264,br,filesize",
-        # Output location/pattern
         "outtmpl": "/opt/airflow/downloads/%(title)s.%(ext)s",
-        # Optional extras (e.g., --cookies /path/cookies.txt)
         "extra": ""
     },
 ) as dag:
