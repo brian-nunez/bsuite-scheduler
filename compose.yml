@@ -28,19 +28,20 @@ services:
       AIRFLOW__WEBSERVER__SECRET_KEY: "SHOULD_REPLACE_MAYBE"
       _AIRFLOW_WWW_USER_USERNAME: admin
       _AIRFLOW_WWW_USER_PASSWORD: admin
-    entrypoint: ["/usr/bin/bash", "-lc"]
-    command: >
-      set -euo pipefail;
-      echo "Initializing DB...";
-      airflow db upgrade;
-      echo "Creating admin user...";
-      airflow users create
-        --role Admin
-        --username "$_AIRFLOW_WWW_USER_USERNAME"
-        --password "$_AIRFLOW_WWW_USER_PASSWORD"
-        --firstname Brian --lastname Admin --email brian@example.com
-        || echo "Admin user likely exists — continuing.";
-      echo "Init complete."
+    entrypoint:
+      - /bin/bash
+      - -lc
+      - |
+        set -euo pipefail
+        echo "Initializing DB..."
+        airflow db upgrade
+        echo "Creating admin user..."
+        airflow users create \
+          --role Admin \
+          --username "$_AIRFLOW_WWW_USER_USERNAME" \
+          --password "$_AIRFLOW_WWW_USER_PASSWORD" \
+          --firstname Brian --lastname Nunez --email brian@bjnunez.com || true
+        echo "Init complete."
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
