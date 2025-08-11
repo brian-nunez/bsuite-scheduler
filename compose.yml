@@ -11,7 +11,6 @@ services:
       retries: 10
     volumes:
       - ./data:/var/lib/postgresql/data
-    restart: unless-stopped
 
   airflow-init:
     image: airflow-local:latest
@@ -22,14 +21,14 @@ services:
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
       AIRFLOW__WEBSERVER__RBAC: "True"
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      AIRFLOW__CORE__FERNET_KEY: "SHOULD_REPLACE_MAYBE"
       AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "True"
-      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY}
-      AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY}
-      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME}
-      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD}
-    entrypoint: ["/usr/bin/bash","-lc"]
+      AIRFLOW__WEBSERVER__SECRET_KEY: "SHOULD_REPLACE_MAYBE"
+      _AIRFLOW_WWW_USER_USERNAME: admin
+      _AIRFLOW_WWW_USER_PASSWORD: admin
+    entrypoint: ["/usr/bin/bash", "-lc"]
     command: >
       set -euo pipefail;
       echo "Initializing DB...";
@@ -39,76 +38,79 @@ services:
         --role Admin
         --username "$_AIRFLOW_WWW_USER_USERNAME"
         --password "$_AIRFLOW_WWW_USER_PASSWORD"
-        --firstname Brian --lastname Nunez --email brian@bjnunez.com
-        || echo "Admin user exists — continuing.";
+        --firstname Brian --lastname Admin --email brian@example.com
+        || echo "Admin user likely exists — continuing.";
       echo "Init complete."
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./downloads:/opt/airflow/downloads
-    restart: "no"
 
   webserver:
     image: airflow-local:latest
     build: ./airflow-image
     depends_on:
+      postgres:
+        condition: service_healthy
       airflow-init:
         condition: service_completed_successfully
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
       AIRFLOW__WEBSERVER__RBAC: "True"
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      AIRFLOW__CORE__FERNET_KEY: "SHOULD_REPLACE_MAYBE"
       AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "True"
-      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY}
-      AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY}
-    command: ["airflow","webserver"]
+      AIRFLOW__WEBSERVER__SECRET_KEY: "SHOULD_REPLACE_MAYBE"
+    command: ["airflow", "webserver"]
     ports:
       - "8080:8080"
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./downloads:/opt/airflow/downloads
-    restart: unless-stopped
 
   scheduler:
     image: airflow-local:latest
     build: ./airflow-image
     depends_on:
+      postgres:
+        condition: service_healthy
       airflow-init:
         condition: service_completed_successfully
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
       AIRFLOW__WEBSERVER__RBAC: "True"
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      AIRFLOW__CORE__FERNET_KEY: "SHOULD_REPLACE_MAYBE"
       AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "True"
-      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY}
-      AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY}
-    command: ["airflow","scheduler"]
+      AIRFLOW__WEBSERVER__SECRET_KEY: "SHOULD_REPLACE_MAYBE"
+    command: ["airflow", "scheduler"]
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./downloads:/opt/airflow/downloads
-    restart: unless-stopped
 
   triggerer:
     image: airflow-local:latest
     build: ./airflow-image
     depends_on:
+      postgres:
+        condition: service_healthy
       airflow-init:
         condition: service_completed_successfully
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
       AIRFLOW__WEBSERVER__RBAC: "True"
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      AIRFLOW__CORE__FERNET_KEY: "SHOULD_REPLACE_MAYBE"
       AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "True"
-      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY}
-      AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY}
-    command: ["airflow","triggerer"]
+      AIRFLOW__WEBSERVER__SECRET_KEY: "SHOULD_REPLACE_MAYBE"
+    command: ["airflow", "triggerer"]
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./downloads:/opt/airflow/downloads
-    restart: unless-stopped
+
